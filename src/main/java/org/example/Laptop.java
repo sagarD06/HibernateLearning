@@ -13,8 +13,8 @@ public class Laptop {
     private int id;
     private String brand;
     private String model;
-    @ManyToMany
-    private List<Student> students;
+//    @ManyToMany
+//    private List<Student> students;
 
     public Laptop () {};
 
@@ -42,13 +42,13 @@ public class Laptop {
         this.model = model;
     }
 
-    public List<Student> getStudents() {
-        return students;
-    }
+//    public List<Student> getStudents() {
+//        return students;
+//    }
 
-    public void setStudents(List<Student> students) {
-        this.students = students;
-    }
+//    public void setStudents(List<Student> students) {
+//        this.students = students;
+//    }
 
     @Override
     public String toString() {

@@ -4,8 +4,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 import java.util.Arrays;
+import java.util.List;
 
 /*
         session.persist(student); //saves the values from student obj -> Create
@@ -19,46 +21,10 @@ import java.util.Arrays;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        Student student1 = new Student();
-        Student student2 = new Student();
-        Student student3 = new Student();
-
 
         Laptop laptop1 = new Laptop();
-        Laptop laptop2 = new Laptop();
-        Laptop laptop3 = new Laptop();
 
 
-        laptop1.setId(101);
-        laptop1.setBrand("Dell");
-        laptop1.setModel("Inspiron");
-
-        laptop2.setId(102);
-        laptop2.setBrand("Apple");
-        laptop2.setModel("M4Pro");
-
-        laptop3.setId(103);
-        laptop3.setBrand("Asus");
-        laptop3.setModel("Rog");
-
-        student1.setId(1);
-        student1.setName("Sagar");
-        student1.setAge(28);
-        student1.setLaptops(Arrays.asList(laptop1, laptop3));
-
-        student2.setId(2);
-        student2.setName("NedStark");
-        student2.setAge(55);
-        student2.setLaptops(Arrays.asList(laptop1,laptop2));
-
-        student3.setId(3);
-        student3.setName("JonSnow");
-        student3.setAge(28);
-        student3.setLaptops(Arrays.asList(laptop3));
-
-        laptop1.setStudents(Arrays.asList(student1, student2));
-        laptop2.setStudents(Arrays.asList(student2));
-        laptop3.setStudents(Arrays.asList(student1, student3));
 
         //1st step configure the Hibernate -> need hibernate.cfg.xml
 //        Configuration config = new Configuration();
@@ -67,7 +33,6 @@ public class Main {
 
         //Create Session
         SessionFactory sf = new Configuration()
-                .addAnnotatedClass(org.example.Student.class)
                 .addAnnotatedClass(org.example.Laptop.class)
                 .configure("hibernate.cfg.xml")
                 .buildSessionFactory();
@@ -77,13 +42,27 @@ public class Main {
         //Always a DB write is a transaction
         Transaction transaction = session.beginTransaction(); // Begin tran
 
-        session.persist(laptop1);
-        session.persist(laptop2);
-        session.persist(laptop3);
+        laptop1 = session.find(Laptop.class, 103); //problem here is cannot find rows other than id clause
 
-        session.persist(student1);
-        session.persist(student2);
-        session.persist(student3);
+        //select * from laptop where name = 'Dell'; -> SQL
+        //from Laptop where nam = "Dell" -> HQL Laptop is class Entity here
+
+        Query query = session.createQuery("from Laptop where brand = 'Dell'",  Laptop.class); //normal query
+        List<Laptop> laptops = query.getResultList();
+
+        final String brand = "Dell";
+        Query query2 = session.createQuery("select brand, model from Laptop where brand like ?1", Laptop.class);
+        query2.setParameter(1, brand);
+        List<Laptop> laptops2 = query.getResultList();
+
+        System.out.println(laptop1);
+        System.out.println(laptops2);
+
+        for(Laptop data : laptops2){
+            System.out.println(data.getBrand() + " " + data.getModel());
+        }
+
+        System.out.println(laptops);
 
         transaction.commit(); //commits the changes
 
